@@ -32,7 +32,7 @@ print("Listening started. Searching for commmand server...")
 while True:
     c, address = s.accept()
     name = sNet.recv(c)
-    if not name==userInfo["userName"]+"@localhost":
+    if not name==userInfo["userName"]+"@"+userInfo["IP"]:
         print(name)
         c.close()
     else:

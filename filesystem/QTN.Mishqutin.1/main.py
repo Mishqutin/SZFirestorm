@@ -1,1 +1,0 @@
-SZReturnValue = 'Hello! I am a new object here!'

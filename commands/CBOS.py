@@ -1,4 +1,5 @@
 SZFUNCS = {}
+DATA = {}
 
 def findObjByName(name, path="."):
     for i in os.listdir(path):
@@ -56,8 +57,17 @@ class TEMP:
     def use(args):
         try: obj = findObjByName(args[1])
         except: return "Missing data."
+        
         if not obj: return "Object doesn't exist."
         if not os.path.isfile(obj+"/main.py"): return "Missing main file in object's directory!"
+        
+        # Verify if object is an item type
+        f = open(obj+"/__info.szi", "r")
+        info = eval(f.read())
+        f.close()
+        if not info["object"]=="item": return "You can't use type " +info["object"]+ " objects!"
+        
+        # Execute code
         f = open(obj+"/main.py", "r")
         code = f.read()
         f.close()
@@ -66,7 +76,8 @@ class TEMP:
     SZFUNCS["use"] = use
     
     def obj_create(args):
-        info = {"object":"SZO", "divideDir":True, "restrictAccess":True, "name":args[1]}
+        try: info = {"object":args[2], "divideDir":True, "restrictAccess":True, "name":args[1]}
+        except: return "Missing data."
         
         # Getting last stamp code
         f = open(mainDirectory + "/SZSTAMP.txt", "r")
@@ -93,5 +104,25 @@ class TEMP:
         
         return "Object successfully created :)"
     SZFUNCS["obj-create"] = obj_create
+    
+    def obj_unit_initialize(args):
+        obj = findObjByName(args[1])
+        if not obj: return "Cannot find unit."
         
+        docsDir = "{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)
         
+        os.system("mkdir "+docsDir)
+        os.system("copy {} {}".format(obj+"\\main.py", docsDir))
+        os.system('start "{}" {}'.format(obj, docsDir+"\\main.py"))
+        
+        return "Done"
+    SZFUNCS["obj-init"] = obj_unit_initialize
+    
+    def obj_unit_select(args):
+        obj = findObjByName(args[1])
+        
+        if not obj: return "Object doesn't exist."
+        if not os.path.isdir("{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)): return "Object not initialized"
+        
+        DATA["selected"] = obj
+    SZFUNCS["select"] = obj_unit_select
