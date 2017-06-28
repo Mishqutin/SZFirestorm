@@ -113,7 +113,13 @@ class TEMP:
         
         os.system("mkdir "+docsDir)
         os.system("copy {} {}".format(obj+"\\main.py", docsDir))
-        os.system('start "{}" {}'.format(obj, docsDir+"\\main.py"))
+        os.system("start {}".format(docsDir+"\\main.py"))
+        
+        dirInfo = {"mainDir":os.getcwd()+"\\"+obj}
+        #
+        f = open(docsDir+"\\dirInfo.szi", "w")
+        f.write(str(dirInfo))
+        f.close()
         
         return "Done"
     SZFUNCS["obj-init"] = obj_unit_initialize
@@ -126,3 +132,12 @@ class TEMP:
         
         DATA["selected"] = obj
     SZFUNCS["select"] = obj_unit_select
+    
+    def obj_unit_sendCommand(args):
+        obj = DATA["selected"]
+        if not os.path.isdir(obj): return "Could not find unit."
+        
+        f = open(obj+"\\cmd.txt", "w")
+        f.write(str(args[1:]))
+        f.close()
+    SZFUNCS["-"] = obj_unit_sendCommand
