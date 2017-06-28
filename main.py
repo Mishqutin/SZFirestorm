@@ -28,32 +28,35 @@ s.bind(("localhost", 8192))
 myName = "main@localhost"
 
 s.listen(1)
-print("Listening started. Searching for commmand server...")
+print("Listening started. Searching for clients...")
+
+
 while True:
     c, address = s.accept()
-    name = sNet.recv(c)
-    if not name==userInfo["userName"]+"@"+userInfo["IP"]:
-        print(name)
+    data = sNet.recv(c)
+    
+    print("Data received:")
+    print(data)
+    
+    szAddress = data[:data.find("::")]
+    szCommands = data[data.find("::")+2:].replace("\\n", "\n")
+    args = szCommands.split()
+    
+    if not szAddress == userInfo["userName"]+"@"+userInfo["IP"]:
+        print("Access denied for "+szAddress)
+        sNet.send(c, "Access denied")
         c.close()
-    else:
-        print("Found "+name)
-        sNet.send(c, myName)
-        break
-while True:
-    isData = select.select([c], [], [], 1)
-    if isData[0]:
-        data = sNet.recv(c)
-        print("Command received:")
-        print(data)
-        args = data.split()
-        
-        notFound = 0
-        for i in cmdList:
-            if args[0] in cmdList[i]:
-                reply = cmdList[i][args[0]](args)
-                sNet.send(c, str(reply))
-                notFound = 0
-                break
-            else:
-                notFound = 1
-        if notFound: sNet.send(c, "Unsupported command: " + args[0])
+        continue
+    
+    notFound = 0
+    for i in cmdList:
+        if args[0] in cmdList[i]:
+            reply = cmdList[i][args[0]](args)
+            sNet.send(c, str(reply))
+            notFound = 0
+            break
+        else:
+            notFound = 1
+    if notFound: sNet.send(c, "Unsupported command: " + args[0])
+    
+    c.close()
