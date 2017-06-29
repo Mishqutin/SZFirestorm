@@ -27,6 +27,8 @@ class TEMP:
                 f.close()
                 
                 if info["divideDir"]: objects.append(info["name"])
+            
+            elif i[-4:]==".szi": continue
                 
             else: files.append(i)
         
