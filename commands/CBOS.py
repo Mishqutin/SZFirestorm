@@ -18,6 +18,7 @@ class TEMP:
         string = ""
         objects = []
         files = []
+        users = []
         
         for i in os.listdir():
             if os.path.isdir(i) and os.path.isfile(i+"/__info.szi"):
@@ -26,7 +27,8 @@ class TEMP:
                 info = eval(data)
                 f.close()
                 
-                if info["divideDir"]: objects.append(info["name"])
+                if info["object"]=="user": users.append(info["name"])
+                elif info["divideDir"]: objects.append(info["name"])
             
             elif i[-4:]==".szi": continue
                 
@@ -35,8 +37,13 @@ class TEMP:
         string = "===Directories and files found:\n"
         for i in files: string += i+"\n"
         
-        string += "===Syztem objects found:\n"
-        for i in objects: string +=i+"\n"
+        if objects!=[]:
+            string += "===Syztem objects found:\n"
+            for i in objects: string +=i+"\n"
+        
+        if users!=[]:
+            string += "===Other users found:\n"
+            for i in users: string += i+"\n"
         
         string += "==="
         return string
@@ -44,14 +51,26 @@ class TEMP:
     
     def cd(args):
         dir = " ".join(args[1:])
+        currentDir = os.getcwd()
+        
         if os.path.isdir(dir):
             if os.path.isfile(dir+"/__info.szi"):
                 f = open(dir+"/__info.szi", "r")
                 info = eval(f.read())
                 f.close
+                
                 if info["restrictAccess"]: return "Unable to complete. Access restricted: "+dir
+                
             os.chdir(dir)
+            os.system("move {}\\USER.{} >> nul".format(currentDir, userInfo["userName"]))
+            
+            userInfo["userLocation"] = os.getcwd()
+            f = open(mainDirectory+"\\SZCONFIG.szi", "w")
+            f.write(str(userInfo))
+            f.close()
+            
             return "Done"
+            
         else: return "Directory does not exist."
     SZFUNCS["cd"] = cd
     

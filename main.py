@@ -19,7 +19,7 @@ for i in os.listdir():
         exec(f.read(), globals())
         f.close()
         cmdList[i[:-3]] = SZFUNCS
-os.chdir("../filesystem")
+os.chdir(userInfo["userLocation"])
         
 
 s = socket.socket()
