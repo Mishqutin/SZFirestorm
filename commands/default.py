@@ -14,4 +14,10 @@ class TEMP:
         return "Done"
     SZFUNCS["show"] = show
     
+    def cat(args):
+        f = open(args[1], "r")
+        a = f.read()
+        f.close()
+        return a
+    SZFUNCS["cat"] = cat
 
