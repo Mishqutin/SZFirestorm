@@ -35,14 +35,20 @@ while True:
     c, address = s.accept()
     data = sNet.recv(c)
     
-    print("Data received:")
-    print(data)
+    if userInfo["outputCommands"]:
+        print("Data received:")
+        print(data)
     
     szAddress = data[:data.find("::")]
     szCommands = data[data.find("::")+2:].replace("\\n", "\n")
     args = szCommands.split()
     
-    if not szAddress == userInfo["userName"]+"@"+userInfo["IP"]:
+    if not userInfo["acceptFaction"] and not szAddress == userInfo["factionTag"]+"."+userInfo["userName"]+"@"+userInfo["IP"]:
+        print("Access denied for "+szAddress)
+        sNet.send(c, "Access denied")
+        c.close()
+        continue
+    elif userInfo["acceptFaction"] and not szAddress[:3] == userInfo["factionTag"]:
         print("Access denied for "+szAddress)
         sNet.send(c, "Access denied")
         c.close()

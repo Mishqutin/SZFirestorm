@@ -113,7 +113,7 @@ class TEMP:
         
         os.system("mkdir "+docsDir)
         os.system("copy {} {}".format(obj+"\\main.py", docsDir))
-        os.system("start {}".format(docsDir+"\\main.py"))
+        os.system("start /D {} {}".format(docsDir, docsDir+"\\main.py"))
         
         dirInfo = {"mainDir":os.getcwd()+"\\"+obj}
         #
@@ -121,7 +121,7 @@ class TEMP:
         f.write(str(dirInfo))
         f.close()
         
-        return "Done"
+        return "Unit "+args[1]+" initialized"
     SZFUNCS["obj-init"] = obj_unit_initialize
     
     def obj_unit_select(args):
@@ -131,6 +131,7 @@ class TEMP:
         if not os.path.isdir("{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)): return "Object not initialized"
         
         DATA["selected"] = obj
+        return "Selected unit: "+args[1]
     SZFUNCS["select"] = obj_unit_select
     
     def obj_unit_sendCommand(args):
@@ -140,4 +141,6 @@ class TEMP:
         f = open(obj+"\\cmd.txt", "w")
         f.write(str(args[1:]))
         f.close()
+        
+        return "Command sent"
     SZFUNCS["-"] = obj_unit_sendCommand

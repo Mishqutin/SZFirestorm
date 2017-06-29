@@ -9,6 +9,9 @@ class TEMP:
         return "pong"
     SZFUNCS["ping"] = ping
     
-
+    def show(args):
+        print(" ".join(args[1:]))
+        return "Done"
+    SZFUNCS["show"] = show
     
 
