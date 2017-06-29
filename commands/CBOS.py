@@ -111,8 +111,9 @@ class TEMP:
         
         docsDir = "{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)
         
-        os.system("mkdir "+docsDir)
-        os.system("copy {} {}".format(obj+"\\main.py", docsDir))
+        if not os.path.isdir(docsDir):  # If unit wasn't initialized earlier - create it's directory in TEMP
+            os.system("mkdir "+docsDir)
+            os.system("copy {} {}".format(obj+"\\main.py", docsDir))
         os.system("start /D {} {}".format(docsDir, docsDir+"\\main.py"))
         
         dirInfo = {"mainDir":os.getcwd()+"\\"+obj}
