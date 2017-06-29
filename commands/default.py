@@ -21,3 +21,7 @@ class TEMP:
         return a
     SZFUNCS["cat"] = cat
 
+    def pwd(args):
+        return os.getcwd()
+    SZFUNCS["pwd"] = pwd
+    

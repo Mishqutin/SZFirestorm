@@ -12,27 +12,32 @@ def findObjByName(name, path="."):
                 break
     return False
 
+def listObjNames(path="."):
+    objects = []
+    files = []
+    users = []
+    
+    for i in os.listdir(path):
+        if os.path.isdir(path+"\\"+i) and os.path.isfile(path+"\\"+i+"\\__info.szi"):
+            f = open(path+"\\"+i+"\\__info.szi", "r")
+            data = f.read()
+            info = eval(data)
+            f.close()
+            
+            if info["object"]=="user": users.append(info["name"])
+            elif info["divideDir"]: objects.append(info["name"])
+        
+        elif i[-4:]==".szi": continue
+            
+        else: files.append(i)
+        
+    return (files, objects, users)
+
 class TEMP:
     
     def ls(args):
-        string = ""
-        objects = []
-        files = []
-        users = []
-        
-        for i in os.listdir():
-            if os.path.isdir(i) and os.path.isfile(i+"/__info.szi"):
-                f = open(i+"/__info.szi", "r")
-                data = f.read()
-                info = eval(data)
-                f.close()
-                
-                if info["object"]=="user": users.append(info["name"])
-                elif info["divideDir"]: objects.append(info["name"])
-            
-            elif i[-4:]==".szi": continue
-                
-            else: files.append(i)
+    
+        files, objects, users = listObjNames()
         
         string = "===Directories and files found:\n"
         for i in files: string += i+"\n"
@@ -69,7 +74,7 @@ class TEMP:
             f.write(str(userInfo))
             f.close()
             
-            return "Done"
+            return "You are now in: "+dir
             
         else: return "Directory does not exist."
     SZFUNCS["cd"] = cd
@@ -166,3 +171,33 @@ class TEMP:
         
         return "Command sent"
     SZFUNCS["-"] = obj_unit_sendCommand
+    
+    
+    
+    def user_backpack(args):
+        if args[1]=="list":
+            files, objects, users = listObjNames(".\\USER.{}\\backpack".format(userInfo["userName"]))
+            
+            string = "===Items stored in your backpack:\n"
+            for i in objects: string +=i+"\n"
+            
+            string += "==="
+            return string
+        elif args[1]=="put":
+            file = args[2]
+            obj = findObjByName(file)
+            
+            if not obj: return "Could not find " + file
+            
+            os.system("move {} USER.{}\\backpack".format(obj, userInfo["userName"]))
+            
+            return "Item put"
+        elif args[1]=="drop":
+            os.chdir("USER.{}\\backpack".format(userInfo["userName"]))
+            obj = findObjByName(args[2])
+            os.chdir("..\\..")
+            if not obj: return "You don't have that object in your backpack"
+            os.system("move USER.{}\\backpack\\{}".format(userInfo["userName"], obj))
+            return "Item dropped"
+    SZFUNCS["bp"] = user_backpack
+            
