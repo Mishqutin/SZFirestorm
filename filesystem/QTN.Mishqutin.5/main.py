@@ -2,7 +2,7 @@ import socket
 import os
 import time
 
-myName = "QTN.relayStation@localhost"
+myName = "QTN.relayStation"
 
 f = open("dirInfo.szi", "r")
 dirInfo = eval(f.read())

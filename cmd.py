@@ -2,7 +2,7 @@ import socket
 import time
 from syztemNetwork import sNet
 
-myName = "QTN.Mishqutin@localhost"
+myName = "QTN.Mishqutin"
 
 
 

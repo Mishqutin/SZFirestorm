@@ -33,6 +33,18 @@ def listObjNames(path="."):
         
     return (files, objects, users)
 
+def getSzStamp():
+        # Getting last stamp code
+        f = open(mainDirectory + "/SZSTAMP.txt", "r")
+        lastStamp = f.read()
+        f.close()
+        # Updating last stamp code file
+        f = open(mainDirectory + "/SZSTAMP.txt", "w")
+        f.write( str(eval(lastStamp)+1) )
+        f.close()
+        
+        return lastStamp
+
 class TEMP:
     
     def ls(args):
@@ -48,7 +60,9 @@ class TEMP:
         
         if users!=[]:
             string += "===Other users found:\n"
-            for i in users: string += i+"\n"
+            for i in users:
+                if i == userInfo["userName"]: continue
+                string += i+"\n"
         
         string += "==="
         return string
@@ -105,14 +119,7 @@ class TEMP:
         try: info = {"object":args[2], "divideDir":True, "restrictAccess":True, "name":args[1]}
         except: return "Missing data."
         
-        # Getting last stamp code
-        f = open(mainDirectory + "/SZSTAMP.txt", "r")
-        lastStamp = f.read()
-        f.close()
-        # Updating last stamp code file
-        f = open(mainDirectory + "/SZSTAMP.txt", "w")
-        f.write( str(eval(lastStamp)+1) )
-        f.close()
+        lastStamp = getSzStamp()
         
         # Creating new directory
         directoryName = "{}.{}.{}".format(userInfo["factionTag"], userInfo["userName"], lastStamp)
@@ -130,6 +137,19 @@ class TEMP:
         
         return "Object successfully created :)"
     SZFUNCS["obj-create"] = obj_create
+    
+    def obj_spawn_existing(args):
+        name = args[1]
+        
+        lastStamp = getSzStamp()
+        
+        obj = "{}.{}.{}".format(userInfo["factionTag"], userInfo["userName"], lastStamp)
+        
+        os.system("copy {}\\objects\\{}".format(mainDirectory, name))
+        os.system("ren name "+obj)
+        
+        return "Created "+name+" in "+obj
+    SZFUNCS["obj-spawn"] = obj_spawn_existing
     
     def obj_unit_initialize(args):
         obj = findObjByName(args[1])
