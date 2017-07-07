@@ -2,9 +2,11 @@ SZFUNCS = {}
 DATA = {}
 
 def findObjByName(name, path="."):
+    if os.path.isdir(name+"\\__info.szi"):
+        return name
     for i in os.listdir(path):
-        if os.path.isfile(i+"/__info.szi"):
-            f = open(i+"/__info.szi", "r")
+        if os.path.isfile(i+"\\__info.szi"):
+            f = open(i+"\\__info.szi", "r")
             info = eval(f.read())
             f.close()
             if info["name"] == name:
@@ -32,6 +34,12 @@ def listObjNames(path="."):
         else: files.append(i)
         
     return (files, objects, users)
+
+def getObjInfoFile(obj, path="."):
+    f = open(path+"\\"+obj+"\\__info.szi", "r")
+    info = eval(f.read())
+    f.close()
+    return info
 
 def getSzStamp():
         # Getting last stamp code
@@ -94,6 +102,9 @@ class TEMP:
     SZFUNCS["cd"] = cd
     
     
+    
+    
+    # Executes main.py of an item (i.e. uses item)
     def use(args):
         try: obj = findObjByName(args[1])
         except: return "Missing data."
@@ -115,11 +126,16 @@ class TEMP:
         return SZReturnValue
     SZFUNCS["use"] = use
     
+    
+    
+    
+    # Creates new object template
     def obj_create(args):
-        try: info = {"object":args[2], "divideDir":True, "restrictAccess":True, "name":args[1]}
+        lastStamp = getSzStamp()
+        
+        try: info = {"object":args[2], "divideDir":True, "restrictAccess":True, "name":args[1]+lastStamp}
         except: return "Missing data."
         
-        lastStamp = getSzStamp()
         
         # Creating new directory
         directoryName = "{}.{}.{}".format(userInfo["factionTag"], userInfo["userName"], lastStamp)
@@ -138,6 +154,7 @@ class TEMP:
         return "Object successfully created :)"
     SZFUNCS["obj-create"] = obj_create
     
+    # Copies unit from \objects in main directory with a new id and name
     def obj_spawn_existing(args):
         name = args[1]
         
@@ -145,22 +162,36 @@ class TEMP:
         
         obj = "{}.{}.{}".format(userInfo["factionTag"], userInfo["userName"], lastStamp)
         
-        os.system("copy {}\\objects\\{}".format(mainDirectory, name))
-        os.system("ren name "+obj)
+        os.system("mkdir "+obj)
+        os.system("copy {}\\objects\\{} {}".format(mainDirectory, name, obj))
+        
+        info = getObjInfoFile(obj)
+        info["name"] = info["name"] + lastStamp
+        
+        f = open(obj+"\\__info.szi", "w")
+        f.write(str(info))
+        f.close()
+        
         
         return "Created "+name+" in "+obj
     SZFUNCS["obj-spawn"] = obj_spawn_existing
     
+    # Initializes unit. Creates it's directory in Documents\Syztem\TEMP and runs it from here.
     def obj_unit_initialize(args):
         obj = findObjByName(args[1])
         if not obj: return "Cannot find unit."
         
         docsDir = "{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)
         
-        if not os.path.isdir(docsDir):  # If unit wasn't initialized earlier - create it's directory in TEMP
-            os.system("mkdir "+docsDir)
-            os.system("copy {} {}".format(obj+"\\main.py", docsDir))
+        if os.path.isdir(docsDir): os.system("del /Q "+docsDir) # If unit was initialized earlier - delete dir and update it
+        os.system("mkdir "+docsDir)
+        os.system("copy {} {}".format(obj+"\\main.py", docsDir))
         os.system("start /D {} {}".format(docsDir, docsDir+"\\main.py"))
+
+        # Place for compiler soc
+        
+        #os.system("start /D {} {} {}".format(docsDir, mainDirectory+"\\socCompiler.py", docsDir+"\\main.soc"))
+        # ----
         
         dirInfo = {"mainDir":os.getcwd()+"\\"+obj}
         #
@@ -171,6 +202,10 @@ class TEMP:
         return "Unit "+args[1]+" initialized"
     SZFUNCS["obj-init"] = obj_unit_initialize
     
+    
+    
+    
+    # Selects unit
     def obj_unit_select(args):
         obj = findObjByName(args[1])
         
@@ -181,6 +216,9 @@ class TEMP:
         return "Selected unit: "+args[1]
     SZFUNCS["select"] = obj_unit_select
     
+    
+    
+    # Sends command to selected unit
     def obj_unit_sendCommand(args):
         obj = DATA["selected"]
         if not os.path.isdir(obj): return "Could not find unit."
@@ -191,6 +229,9 @@ class TEMP:
         
         return "Command sent"
     SZFUNCS["-"] = obj_unit_sendCommand
+    
+    
+    
     
     
     
@@ -216,6 +257,7 @@ class TEMP:
             os.chdir("USER.{}\\backpack".format(userInfo["userName"]))
             obj = findObjByName(args[2])
             os.chdir("..\\..")
+            
             if not obj: return "You don't have that object in your backpack"
             os.system("move USER.{}\\backpack\\{}".format(userInfo["userName"], obj))
             return "Item dropped"
