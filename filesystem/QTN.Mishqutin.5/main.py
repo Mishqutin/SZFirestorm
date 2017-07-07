@@ -10,12 +10,12 @@ f.close()
 
 while True:
     time.sleep(0.8)
-    f = open(dirInfo["mainDir"]+"\\cmd.txt", "r")
+    f = open("cmd.txt", "r")
     cmd = f.read()
-    f.close
+    f.close()
     if cmd==" ": continue
     text = " ".join(eval(cmd))
-    f = open(dirInfo["mainDir"]+"\\cmd.txt", "w")
+    f = open("cmd.txt", "w")
     f.write(" ")
     f.close()
     

@@ -185,7 +185,13 @@ class TEMP:
         
         if os.path.isdir(docsDir): os.system("del /Q "+docsDir) # If unit was initialized earlier - delete dir and update it
         os.system("mkdir "+docsDir)
+        os.system("copy {} {}".format(obj+"\\__info.szi", docsDir))
         os.system("copy {} {}".format(obj+"\\main.py", docsDir))
+        
+        f = open(docsDir+"\\cmd.txt", "w")
+        f.write(" ")
+        f.close()
+        
         os.system("start /D {} {}".format(docsDir, docsDir+"\\main.py"))
 
         # Place for compiler soc
@@ -207,7 +213,7 @@ class TEMP:
     
     # Selects unit
     def obj_unit_select(args):
-        #obj = findObjByName(args[1])
+        obj = findObjByName(args[1], "{}\\Documents\\Syztem\\TEMP".format(os.getenv("USERPROFILE")))
         
         #if not obj: return "Object doesn't exist."
         if not os.path.isdir("{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)): return "Object not initialized"
@@ -223,7 +229,7 @@ class TEMP:
         obj = DATA["selected"]
         #if not os.path.isdir(obj): return "Could not find unit."
         
-        f = open(obj+"\\cmd.txt", "w")
+        f = open("{}\\Documents\\Syztem\\TEMP\\{}\\cmd.txt".format(os.getenv("USERPROFILE"), obj), "w")
         f.write(str(args[1:]))
         f.close()
         
