@@ -207,9 +207,9 @@ class TEMP:
     
     # Selects unit
     def obj_unit_select(args):
-        obj = findObjByName(args[1])
+        #obj = findObjByName(args[1])
         
-        if not obj: return "Object doesn't exist."
+        #if not obj: return "Object doesn't exist."
         if not os.path.isdir("{}\\Documents\\Syztem\\TEMP\\{}".format(os.getenv("USERPROFILE"), obj)): return "Object not initialized"
         
         DATA["selected"] = obj
@@ -221,7 +221,7 @@ class TEMP:
     # Sends command to selected unit
     def obj_unit_sendCommand(args):
         obj = DATA["selected"]
-        if not os.path.isdir(obj): return "Could not find unit."
+        #if not os.path.isdir(obj): return "Could not find unit."
         
         f = open(obj+"\\cmd.txt", "w")
         f.write(str(args[1:]))
